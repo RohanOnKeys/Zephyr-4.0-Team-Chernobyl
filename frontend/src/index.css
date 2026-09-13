@@ -16,6 +16,138 @@ body {
   overflow-x: hidden;
 }
 
+.study-page { position: relative; width: 100vw; height: 100vh; overflow: hidden; color: #f7eee4; background: #10151c; }
+.study-page canvas { display: block; }
+.study-hud { position: fixed; z-index: 3; top: 1.3rem; left: 1.4rem; display: flex; align-items: flex-start; justify-content: space-between; width: min(36rem, calc(100vw - 2.8rem)); pointer-events: none; }
+.study-hud h1 { margin: .2rem 0 .1rem; color: #fff7ea; font: 700 clamp(1.4rem, 3vw, 2.15rem)/1 Georgia, serif; text-shadow: 0 2px 14px #0a0b10; }
+.study-hud p { margin: 0; color: rgba(255, 241, 220, .74); font-size: .74rem; }
+.study-kicker { color: #c9a77b; font-size: .62rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.study-status { display: grid; gap: .18rem; min-width: 5rem; padding: .55rem .7rem; border: 1px solid rgba(245, 194, 122, .28); border-radius: 8px; background: rgba(19, 22, 27, .68); text-align: right; backdrop-filter: blur(8px); }
+.study-status strong { color: #f5c47f; font: 700 .75rem Georgia, serif; }
+.study-status span { color: rgba(255, 246, 229, .68); font-size: .62rem; }
+.study-controls { position: fixed; z-index: 3; right: 1.4rem; bottom: 1.35rem; display: grid; gap: .42rem; min-width: 13rem; padding: .85rem 1rem; border: 1px solid rgba(245, 194, 122, .3); border-radius: 10px; color: rgba(255, 242, 225, .84); background: rgba(18, 21, 26, .74); box-shadow: 0 16px 40px rgba(0,0,0,.28); backdrop-filter: blur(10px); font-size: .65rem; }
+.study-controls strong { color: #f5c47f; font: 700 .85rem Georgia, serif; }
+.study-controls kbd { display: inline-grid; min-width: 1.25rem; min-height: 1.25rem; margin-right: .22rem; place-items: center; border: 1px solid rgba(255,255,255,.22); border-radius: 4px; color: #fff4df; background: rgba(255,255,255,.08); font-size: .58rem; }
+.study-controls button, .study-back { border: 1px solid rgba(245, 194, 122, .42); border-radius: 5px; color: #241b13; background: #e7bd7b; font: 700 .67rem Trebuchet MS, sans-serif; cursor: pointer; }
+.study-controls button { justify-self: start; margin-top: .25rem; padding: .38rem .6rem; }
+.study-back { position: fixed; z-index: 4; top: 1.4rem; right: 1.4rem; padding: .55rem .78rem; }
+.study-loader { padding: .65rem .9rem; border-radius: 8px; color: #fff4df; background: rgba(17, 20, 26, .84); font-size: .72rem; white-space: nowrap; }
+.laptop-prompt { padding: .45rem .7rem; border: 1px solid rgba(150,230,255,.7); border-radius: 999px; color: #f7fdff; background: rgba(12,28,39,.88); box-shadow: 0 8px 26px rgba(0,0,0,.3); font: 700 .68rem Inter, sans-serif; white-space: nowrap; }
+.laptop-os { --os-ink: #203143; --os-blue: #7dbbd0; position: fixed; z-index: 20; overflow: hidden; color: var(--os-ink); background: #afced7; border: 1px solid rgba(255,255,255,.68); font-family: Inter, sans-serif; box-shadow: 0 32px 100px rgba(12,22,28,.52); transition: inset .28s ease, border-radius .28s ease; animation: os-enter .28s ease-out; }
+.laptop-os.is-windowed { inset: 7vh 8vw; border-radius: 16px; }
+.laptop-os.is-fullscreen { inset: 0; border-radius: 0; }
+/* Original abstract wallpaper: warm-to-cool depth built from layered radial
+   gradients plus two soft ribbon blobs. Gradients only - no image assets, and
+   no large blur() radii, because this paints over a live WebGL canvas and a
+   big blur would be re-rasterised every frame the window animates. */
+.os-wallpaper { position: absolute; inset: 0; overflow: hidden; background:
+  radial-gradient(120% 90% at 82% 8%, rgba(255,206,160,.85), transparent 55%),
+  radial-gradient(90% 70% at 12% 12%, rgba(255,140,170,.5), transparent 60%),
+  radial-gradient(130% 110% at 20% 100%, rgba(36,52,140,.9), transparent 62%),
+  radial-gradient(80% 60% at 62% 62%, rgba(216,96,150,.55), transparent 65%),
+  linear-gradient(168deg, #2b3f8f 0%, #6b3d95 34%, #b8477f 60%, #e8815f 82%, #f6c77d 100%); }
+.os-wallpaper::before, .os-wallpaper::after { content: ""; position: absolute; border-radius: 50% 50% 46% 54% / 60% 45% 55% 40%; filter: blur(14px); }
+/* cool ribbon sweeping in from the lower left */
+.os-wallpaper::before { width: 115%; height: 62%; left: -25%; bottom: -26%; transform: rotate(-11deg); opacity: .55;
+  background: linear-gradient(104deg, rgba(10,26,82,.95), rgba(78,122,226,.6) 58%, rgba(150,196,255,.18)); }
+/* warm ribbon crossing it, kept thinner so the two read as layered glass */
+.os-wallpaper::after { width: 85%; height: 40%; right: -18%; bottom: -12%; transform: rotate(14deg); opacity: .48;
+  background: linear-gradient(128deg, rgba(255,196,120,.9), rgba(232,80,140,.55) 62%, rgba(120,60,160,.15)); }
+.os-topbar { position: relative; z-index: 2; height: 2.8rem; padding: 0 1rem; display: flex; align-items: center; gap: 1rem; color: #f7fbfa; background: rgba(26,44,54,.72); border-bottom: 1px solid rgba(255,255,255,.22); backdrop-filter: blur(16px); font-size: .72rem; }
+.os-topbar strong { font: 700 .9rem Georgia, serif; letter-spacing: .04em; }
+.mac-apple { font-size: .72rem !important; }
+.mac-menu { display: flex; align-items: center; gap: .85rem; margin-right: auto; }
+.mac-menu span, .mac-menu b { color: rgba(255,255,255,.9); font-size: .68rem; }
+.mac-status { opacity: .72; }
+.os-topbar button { border: 1px solid rgba(255,255,255,.32); border-radius: 6px; padding: .4rem .65rem; color: #fff; background: rgba(255,255,255,.11); cursor: pointer; }
+.os-actions { display: flex; gap: .45rem; }
+/* Bounded top and bottom so the column has a definite height, then auto-fill
+   wraps into a second column once it runs out of room - the way macOS does it.
+   Without the bottom bound the 7th icon slid under the dock. */
+.os-desktop-icons { position: absolute; z-index: 2; top: 4.2rem; bottom: 6.5rem; left: 1.2rem; display: grid; grid-auto-flow: column; grid-template-rows: repeat(auto-fill, 4.6rem); align-content: start; justify-items: start; gap: .65rem .4rem; }
+.os-desktop-icons button { display: grid; width: 4.5rem; gap: .25rem; justify-items: center; border: 0; border-radius: 8px; padding: .45rem .25rem; color: #faffff; background: transparent; text-shadow: 0 1px 5px rgba(0,0,0,.5); cursor: pointer; font-size: .66rem; }
+.os-desktop-icons button:hover { background: rgba(255,255,255,.16); }
+/* The tile itself is now drawn inside the SVG (see components/MacIcons.jsx),
+   so the wrapper only provides the box and the drop shadow. No border or
+   background here or it would frame the artwork twice. */
+.os-desktop-icons span { display: block; width: 2.7rem; height: 2.7rem; }
+.mac-app-icon { position: relative; display: block; filter: drop-shadow(0 4px 8px rgba(12,30,40,.32)); }
+.mac-app-icon svg { display: block; width: 100%; height: 100%; }
+.os-window { position: absolute; z-index: 3; inset: 7% 9% 10% 10%; min-width: 0; min-height: 0; display: grid; grid-template-rows: 2.65rem minmax(0,1fr); overflow: hidden; border: 1px solid rgba(255,255,255,.7); border-radius: 13px; background: rgba(247,243,233,.95); box-shadow: 0 28px 80px rgba(24,47,54,.34); }
+.os-window.is-minimized { display: none; }
+.os-widget-stack { position: absolute; z-index: 2; top: 4.1rem; right: 1.2rem; width: min(15rem,30%); display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; color: #263843; }
+.mac-widget { min-width: 0; padding: .75rem; border: 1px solid rgba(255,255,255,.55); border-radius: 14px; background: rgba(245,249,248,.78); box-shadow: 0 12px 35px rgba(35,60,72,.2); backdrop-filter: blur(18px); }
+.mac-clock-widget { grid-column: 1 / -1; display: grid; grid-template-columns: 4.6rem minmax(0,1fr); align-items: center; gap: .75rem; }.mac-clock-widget > div:last-child { min-width: 0; display: grid; }.mac-clock-widget time { color: #182d37; font: 500 clamp(1.35rem,3vw,2.2rem)/1 Inter,sans-serif; letter-spacing: -.06em; }.mac-clock-widget span { margin-top: .3rem; overflow: hidden; color: #5b7079; font-size: .58rem; text-overflow: ellipsis; white-space: nowrap; }
+.analog-clock { position: relative; width: 4.6rem; aspect-ratio: 1; border: .28rem solid #172c39; border-radius: 50%; background: #fffaf0; box-shadow: inset 0 0 0 1px rgba(19,43,56,.12),0 5px 14px rgba(21,44,56,.18); }.analog-clock i { --angle: calc(var(--tick) * 30deg); position: absolute; left: calc(50% - 1px); top: .3rem; width: 2px; height: .25rem; transform: rotate(var(--angle)); transform-origin: 1px 1.75rem; border-radius: 2px; background: #29414e; }.analog-clock i:nth-child(3n + 1) { height: .4rem; width: 3px; }.analog-clock b { position: absolute; left: calc(50% - 1px); bottom: 50%; width: 2px; border-radius: 3px; background: #172c39; transform-origin: 50% 100%; }.analog-clock .clock-hour { height: 1.15rem; width: 3px; }.analog-clock .clock-minute { height: 1.55rem; }.analog-clock .clock-second { height: 1.7rem; width: 1px; background: #ef4f45; }.analog-clock em { position: absolute; left: 50%; top: 50%; width: .42rem; height: .42rem; transform: translate(-50%,-50%); border-radius: 50%; background: #ef4f45; }
+.mac-calendar-widget { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr auto; gap: .25rem .5rem; }.mac-calendar-widget header { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; color: #df493e; font-size: .65rem; text-transform: uppercase; }.mac-calendar-widget header b { display: grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 50%; color: #fff; background: #ef5147; }.mac-calendar-widget div { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(7,1fr); color: #75868c; font-size: .52rem; text-align: center; }.mac-calendar-widget p { margin: .35rem 0 0; color: #78878c; font-size: .55rem; }.mac-calendar-widget > strong { align-self: end; font-size: .68rem; text-align: right; }.mac-calendar-widget small { grid-column: 1 / -1; color: #77878e; font-size: .55rem; text-align: right; }
+.mac-focus-widget { grid-column: 1 / -1; display: grid; gap: .15rem; }.mac-focus-widget > span { color: #74878f; font-size: .53rem; font-weight: 800; letter-spacing: .12em; }.mac-focus-widget > strong { font-size: 1.35rem; }.mac-focus-widget p { margin: 0; color: #74878f; font-size: .58rem; }.mac-focus-widget i { height: .35rem; margin-top: .25rem; overflow: hidden; border-radius: 999px; background: rgba(44,75,86,.16); }.mac-focus-widget i b { display: block; width: 67%; height: 100%; border-radius: inherit; background: #42b972; }
+.os-windowbar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 .75rem; color: #42505a; background: rgba(232,235,229,.96); border-bottom: 1px solid #cad1cf; font-size: .72rem; }
+.os-windowbar > button { justify-self: end; border: 0; width: 1.7rem; height: 1.7rem; border-radius: 50%; color: #52616a; background: transparent; cursor: pointer; font-size: 1.1rem; }
+.os-windowbar > button:hover { background: #e6b6ad; }
+.os-dots { display: flex; gap: .35rem; }
+.os-dots button { width: .68rem; height: .68rem; padding: 0; border: 0; border-radius: 50%; cursor: pointer; }
+.dot-close { background: #ff5f57 !important; }.dot-minimize { background: #febc2e !important; }.dot-maximize { background: #28c840 !important; }
+.os-browser { min-height: 0; display: grid; grid-template-rows: 2.8rem 1fr; background: #f9f6ef; }
+.os-browser form { display: grid; grid-template-columns: auto 1fr auto; gap: .45rem; align-items: center; padding: .45rem .6rem; background: #edf0ed; border-bottom: 1px solid #d2d9d7; }
+.os-browser form button { border: 0; border-radius: 6px; padding: .42rem .65rem; color: #334b56; background: #dce5e4; cursor: pointer; }
+.os-browser input { min-width: 0; border: 1px solid #cad4d2; border-radius: 7px; padding: .48rem .7rem; color: #2e424b; background: #fff; outline: none; }
+.os-browser input:focus { border-color: #72aebf; box-shadow: 0 0 0 2px rgba(114,174,191,.16); }
+.os-browser iframe { width: 100%; height: 100%; border: 0; background: #fff; }
+.os-spotify { min-width: 0; min-height: 0; display: grid; grid-template-columns: clamp(8rem,22%,12rem) minmax(0,1fr); overflow: hidden; color: #fff; background: #121212; }
+.os-spotify > aside { min-width: 0; display: flex; flex-direction: column; gap: .35rem; padding: 1rem .8rem; background: #090909; }
+.os-spotify > aside strong { margin-bottom: .35rem; font-size: 1.2rem; }
+.os-spotify > aside button { width: 100%; border: 0; border-radius: 6px; padding: .48rem .55rem; color: #b3b3b3; background: transparent; cursor: pointer; font: 650 .72rem Inter,sans-serif; text-align: left; }
+.os-spotify > aside button:hover,.os-spotify > aside button.active { color: #fff; background: #242424; }
+.os-spotify > aside small { margin-top: 1rem; color: #747474; font-size: .52rem; letter-spacing: .12em; }
+.os-spotify > div { min-width: 0; min-height: 0; overflow: auto; background: linear-gradient(#284e43 0,#182a25 12rem,#121212 23rem); scrollbar-color: #555 #121212; }
+.spotify-heading { padding: 1rem 1rem .55rem; }
+.spotify-heading span { font-size: .58rem; font-weight: 800; text-transform: uppercase; }
+.spotify-heading h2 { margin: .12rem 0 .2rem; color: #fff; font: 800 clamp(1.6rem,3.2vw,2.8rem)/1 Inter,sans-serif; letter-spacing: -.05em; }
+.spotify-heading p { margin: 0; color: #c8d2ce; font-size: .68rem; }
+.os-spotify iframe { display: block; width: calc(100% - 2rem); height: 220px; margin: 0 1rem 1rem; border: 0; border-radius: 12px; background: #121212; }
+.music-controller { display: grid; grid-template-columns: clamp(4.6rem,18%,7rem) minmax(0,1fr); align-items: stretch; gap: .85rem; margin: 0 1rem .65rem; padding: .72rem; border-radius: 14px; color: #fff; background: #181818; box-shadow: 0 10px 30px rgba(0,0,0,.22); }
+.music-cover { position: relative; aspect-ratio: 1; min-height: 4.6rem; display: grid; place-items: center; overflow: hidden; border-radius: 10px; color: #fff; background: radial-gradient(circle at 72% 35%,#ffb442,transparent 23%), radial-gradient(circle,var(--cover-color,#75249c),#17101f 70%); font-weight: 900; }
+.music-cover i { position: absolute; width: 70%; height: 70%; border: 2px solid rgba(255,255,255,.28); border-radius: 50%; }
+.music-player-main { min-width: 0; display: grid; grid-template: auto auto 1fr / minmax(0,1fr); align-content: center; gap: .3rem; }
+.music-meta { min-width: 0; display: grid; gap: .2rem; }.music-meta strong,.music-meta span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.music-meta span { color: #a9a9a9; font-size: .64rem; }
+.music-actions { display: flex; align-items: center; justify-content: center; gap: clamp(.5rem,3vw,1.3rem); }
+.music-actions button { width: 2rem; height: 2rem; border: 0; border-radius: 50%; color: #b8b8b8; background: transparent; cursor: pointer; font-weight: 800; }.music-actions button:hover,.music-actions button.is-active { color: #1ed760; }.music-actions .music-play { width: 2.8rem; height: 2.8rem; color: #111; background: #fff; }
+.music-timeline { min-width: 0; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: .4rem; }.music-timeline input { width: 100%; min-width: 0; accent-color: #1ed760; cursor: pointer; }.music-timeline span { color: #aaa; font-size: .55rem; white-space: nowrap; }
+.music-timeline input:disabled { cursor: wait; opacity: .45; }
+.music-volume { display: grid; grid-template-columns: 1.8rem minmax(4rem,7rem); align-items: center; justify-content: end; gap: .25rem; }.music-volume button { border: 0; color: #ddd; background: transparent; cursor: pointer; font-size: .8rem; }.music-volume input { width: 100%; min-width: 0; accent-color: #1ed760; cursor: pointer; }
+.spotify-search { display: grid; gap: .25rem; margin: 0 1rem .55rem; color: #c9d5d0; font-size: .6rem; }.spotify-search input { border: 0; border-radius: 18px; padding: .55rem .8rem; outline: 0; }
+.spotify-track-list { display: grid; gap: .2rem; margin: 0 1rem .6rem; }
+.spotify-track-list button { min-width: 0; display: grid; grid-template-columns: 1.8rem minmax(0,1fr) auto; align-items: center; gap: .45rem; border: 0; border-radius: 7px; padding: .45rem .55rem; color: #aaa; background: transparent; cursor: pointer; text-align: left; }.spotify-track-list button:hover,.spotify-track-list button.active { color: #fff; background: #282828; }.spotify-track-list strong { min-width: 0; overflow: hidden; color: inherit; font-size: .72rem; text-overflow: ellipsis; white-space: nowrap; }.spotify-track-list small { display: block; overflow: hidden; color: #888; font-weight: 400; text-overflow: ellipsis; }.spotify-track-list em { font-size: .55rem; font-style: normal; }
+.spotify-official-toggle { display: block; margin: .2rem 1rem .8rem; border: 1px solid #555; border-radius: 999px; padding: .45rem .8rem; color: #ddd; background: transparent; cursor: pointer; font-size: .62rem; }.spotify-official-toggle:hover { border-color: #fff; color: #fff; }
+.room-music-widget { position: fixed; z-index: 10; top: 1rem; left: 50%; transform: translateX(-50%); }
+.room-clock-widget { position: fixed; z-index: 9; top: 7rem; right: 1.4rem; display: grid; grid-template-columns: 4.6rem minmax(5.5rem,auto); align-items: center; gap: .65rem; padding: .65rem .8rem; border: 1px solid rgba(255,255,255,.3); border-radius: 16px; color: #f8f3e7; background: rgba(25,36,43,.82); box-shadow: 0 14px 38px rgba(42,25,20,.24); backdrop-filter: blur(14px); }.room-clock-widget > div:last-child { display: grid; gap: .2rem; }.room-clock-widget time { font: 700 1.25rem/1 Inter,sans-serif; }.room-clock-widget span { color: #c8d0d0; font-size: .58rem; }.room-clock-toggle { position: absolute; top: .35rem; right: .4rem; width: 1.35rem; height: 1.35rem; border: 0; border-radius: 50%; color: #cbd4d5; background: rgba(255,255,255,.09); cursor: pointer; }.room-clock-widget.is-collapsed { grid-template-columns: 3rem; padding: .42rem; }.room-clock-widget.is-collapsed .analog-clock { width: 3rem; }.room-clock-widget.is-collapsed .room-clock-toggle { top: -.35rem; right: -.35rem; background: #233b48; }
+.music-controller.is-compact { grid-template-columns: 2.5rem minmax(0,1fr); width: min(25rem,calc(100vw - 2rem)); margin: 0; padding: .42rem .55rem; border: 1px solid rgba(255,255,255,.16); border-radius: 11px; background: rgba(18,18,18,.9); backdrop-filter: blur(14px); }
+.music-controller.is-compact .music-cover { min-height: 0; width: 2.5rem; height: 2.5rem; font-size: .65rem; }.music-controller.is-compact .music-cover i { width: 1.8rem; height: 1.8rem; }.music-controller.is-compact .music-player-main { grid-template: auto auto auto / minmax(0,1fr) auto; column-gap: .5rem; }.music-controller.is-compact .music-meta { grid-column: 1; }.music-controller.is-compact .music-timeline { grid-column: 1; display: block; }.music-controller.is-compact .music-actions { grid-column: 2; grid-row: 1 / 3; gap: .15rem; }.music-controller.is-compact .music-actions button { width: 1.8rem; height: 1.8rem; font-size: .65rem; }.music-controller.is-compact .music-actions .music-play { width: 2.2rem; height: 2.2rem; }.music-controller.is-compact .music-volume { grid-column: 1 / -1; grid-template-columns: 1.6rem minmax(0,1fr); justify-content: stretch; }.music-controller.is-compact .music-volume button { padding: 0; }
+.os-home { display: grid; place-content: center; justify-items: center; padding: 2rem; text-align: center; background: radial-gradient(circle at 50% 25%, #fff, #e7f0ef 55%, #cededc); }
+.os-home > span { color: #69939e; font-size: .62rem; font-weight: 800; letter-spacing: .18em; }
+.os-home h2 { margin: .55rem 0 .4rem; color: #294956; font: 700 clamp(1.6rem,4vw,3.4rem)/1.05 Georgia, serif; }
+.os-home p { margin: 0 0 1.2rem; color: #64757a; font-size: .76rem; }
+.os-home div { display: flex; gap: .6rem; }
+.os-home button { border: 1px solid #a8c6ca; border-radius: 8px; padding: .55rem .85rem; color: #31535c; background: rgba(255,255,255,.75); cursor: pointer; }
+.os-notes { min-height: 0; display: grid; grid-template-rows: auto 1fr; gap: .65rem; padding: 1.25rem; background: #fff9de; }
+.os-notes label { color: #6b5931; font: 700 1.1rem Georgia, serif; }
+.os-notes textarea { resize: none; border: 0; outline: 0; padding: .25rem; color: #514a38; background: transparent; font: 400 .9rem/1.8 Georgia, serif; }
+.os-files { overflow: auto; padding: 1.3rem; background: #f6f7f4; }
+.os-files h2 { margin: 0 0 1rem; color: #304b56; font: 700 1.3rem Georgia, serif; }
+.os-files > div { display: grid; grid-template-columns: 2.3rem 1fr auto; align-items: center; gap: .65rem; padding: .7rem; border-bottom: 1px solid #dde3e1; }
+.os-files > div span { font-size: 1.35rem; }.os-files small { color: #849095; }
+.os-empty { display: grid; place-items: center; color: #617277; background: rgba(245,248,245,.92); }
+/* Extra bottom padding reserves the strip the running-app dots sit in, so the
+   dots never overlap the icon art or spill outside the bar. */
+.os-dock { position: absolute; z-index: 4; left: 50%; bottom: .7rem; display: flex; align-items: flex-end; gap: .4rem; padding: .4rem .5rem .75rem; transform: translateX(-50%); border: 1px solid rgba(255,255,255,.28); border-radius: 16px; background: rgba(228,235,240,.22); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 10px 30px rgba(8,18,26,.35); backdrop-filter: blur(18px) saturate(165%); }
+.os-dock button { position: relative; width: 2.4rem; height: 2.4rem; padding: 0; border: 0; background: transparent; cursor: pointer; transition: transform .16s ease; }
+.os-dock .mac-app-icon { width: 100%; height: 100%; }
+.os-dock button:hover { transform: translateY(-5px); }
+.os-dock button:hover .mac-app-icon { filter: drop-shadow(0 7px 11px rgba(8,18,26,.45)); }
+.os-dock button.active::after { content: ""; position: absolute; left: 50%; bottom: -.42rem; width: .23rem; height: .23rem; transform: translateX(-50%); border-radius: 50%; background: rgba(255,255,255,.85); }
+@keyframes os-enter { from { opacity: 0; transform: scale(1.025); } to { opacity: 1; transform: scale(1); } }
+@media (max-width: 720px) { .study-hud { width: calc(100vw - 2rem); left: 1rem; top: 1rem; } .study-controls { right: 1rem; bottom: 1rem; } .study-back { top: 1rem; right: 1rem; } .laptop-os.is-windowed { inset: 3vh 3vw; } .os-window { inset: 8% 4% 11% 8%; } .mac-menu span { display: none; } .os-spotify { grid-template-columns: 1fr; } .os-spotify > aside { display: none; } }
+
 /* Base custom utility for glassmorphism */
 .glass-panel {
   background: var(--color-glass);
@@ -23,4 +155,185 @@ body {
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--color-glass-border);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Movable Room Widgets */
+.draggable-widget {
+  /* Matches the rounded corners of the widgets inside. The wrapper is
+     transparent and was square, so any shadow drawn on it poked out past the
+     child's rounded corner as a visible notch. */
+  border-radius: 16px;
+  transition: transform 0.15s ease;
+}
+.draggable-widget.is-dragging {
+  opacity: 0.92;
+  transform: scale(1.02);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+}
+.draggable-widget .room-hud,
+.draggable-widget .room-clock-widget,
+.draggable-widget .room-music-widget {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+.room-widget {
+  min-width: 15rem;
+  max-width: 19rem;
+  padding: .85rem 1rem;
+  border: 1px solid rgba(255, 255, 255, .3);
+  border-radius: 16px;
+  color: #f8f3e7;
+  background: rgba(25, 36, 43, .82);
+  box-shadow: 0 14px 38px rgba(42, 25, 20, .24);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-family: Inter, system-ui, sans-serif;
+}
+.room-widget-header {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-bottom: .65rem;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, .12);
+  font-size: .8rem;
+}
+.room-widget-header strong {
+  margin-right: auto;
+  color: #f5c47f;
+  font: 700 .85rem Inter, system-ui, sans-serif;
+  letter-spacing: .02em;
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+}
+.room-widget-link {
+  border: 1px solid rgba(245, 194, 122, .35);
+  padding: .25rem .6rem;
+  border-radius: 6px;
+  color: #f5c47f;
+  background: rgba(245, 194, 122, .15);
+  cursor: pointer;
+  font-size: .65rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  transition: all .16s ease;
+}
+.room-widget-link:hover {
+  background: rgba(245, 194, 122, .3);
+  color: #ffffff;
+  border-color: rgba(245, 194, 122, .55);
+}
+.room-widget-body {
+  display: grid;
+  gap: .5rem;
+  cursor: pointer;
+}
+.room-widget-subhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.room-widget-subhead small {
+  color: rgba(255, 244, 226, .65);
+  font-size: .62rem;
+}
+.room-card-badge {
+  color: #f5c47f;
+  font-size: .6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.room-card-text {
+  margin: .25rem 0;
+  color: #ffffff;
+  font-size: .82rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.room-widget-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: .25rem;
+}
+.room-card-hint {
+  color: rgba(255, 244, 226, .55);
+  font-size: .6rem;
+}
+.room-widget-next {
+  border: 1px solid rgba(245, 194, 122, .3);
+  padding: .22rem .55rem;
+  border-radius: 5px;
+  color: #f5c47f;
+  background: rgba(245, 194, 122, .12);
+  cursor: pointer;
+  font-size: .62rem;
+  font-weight: 700;
+  transition: all .16s ease;
+}
+.room-widget-next:hover {
+  background: rgba(245, 194, 122, .28);
+  color: #ffffff;
+}
+.room-tracker-row {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  padding: .5rem .65rem;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(255, 255, 255, .08);
+  transition: all .18s ease;
+}
+.room-tracker-row:hover {
+  background: rgba(245, 194, 122, .12);
+  border-color: rgba(245, 194, 122, .3);
+  transform: translateX(2px);
+}
+.room-tracker-row b {
+  display: block;
+  color: #ffffff;
+  font-size: .76rem;
+  font-weight: 700;
+}
+.room-tracker-row small {
+  color: #cbd5e1;
+  font-size: .63rem;
+}
+.tracker-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .22rem .48rem;
+  border-radius: 6px;
+  font-size: .6rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.tracker-badge.gh {
+  background: rgba(56, 139, 253, 0.22);
+  color: #79c0ff;
+  border: 1px solid rgba(56, 139, 253, 0.38);
+}
+.tracker-badge.gh svg {
+  color: #79c0ff;
+}
+.tracker-badge.lc {
+  background: rgba(255, 161, 22, 0.22);
+  color: #ffb84d;
+  border: 1px solid rgba(255, 161, 22, 0.38);
+}
+.tracker-badge.lc svg {
+  color: #ffb84d;
 }

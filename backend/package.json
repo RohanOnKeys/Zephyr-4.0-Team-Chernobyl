@@ -2,9 +2,13 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
+    "migrate": "node src/scripts/migrate.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -16,9 +20,10 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.7.0",
-    "firebase-admin": "^14.4.0",
+    "firebase-admin": "13.6.0",
     "helmet": "^8.3.0",
     "node-cron": "^4.6.0",
-    "nodemailer": "^10.0.9"
+    "nodemailer": "^10.0.9",
+    "pg": "^8.23.0"
   }
 }

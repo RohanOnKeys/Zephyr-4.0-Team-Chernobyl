@@ -64,6 +64,11 @@ async function fetchContributionCalendar(username) {
   return {
     totalContributions: calendar.totalContributions,
     currentStreak: calculateStreak(days),
+    // The raw per-day series, needed to draw the contribution heatmap. Roughly
+    // 365 entries of two small fields, so it's cheap enough to send whole.
+    days,
+    bestDay: days.reduce((best, day) => Math.max(best, day.contributionCount), 0),
+    activeDays: days.filter((day) => day.contributionCount > 0).length,
   };
 }
 
@@ -100,8 +105,15 @@ async function getGithubStats(username) {
     publicRepos: profile.public_repos,
     followers: profile.followers,
     profileUrl: profile.html_url,
+    name: profile.name,
+    bio: profile.bio,
+    following: profile.following,
+    createdAt: profile.created_at,
     totalContributions: calendar?.totalContributions ?? null,
     currentStreak: calendar?.currentStreak ?? null,
+    days: calendar?.days ?? null,
+    bestDay: calendar?.bestDay ?? null,
+    activeDays: calendar?.activeDays ?? null,
   };
 }
 

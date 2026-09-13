@@ -1,8 +1,9 @@
 const { initializeApp, getApps, cert } = require("firebase-admin/app");
-const { getFirestore } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
 
-let _db = null;
+// Firebase is used for authentication only. All app data lives in Postgres
+// (see config/db.js).
+
 let _auth = null;
 
 function initFirebaseAdmin() {
@@ -21,7 +22,6 @@ function initFirebaseAdmin() {
         }),
       });
 
-      _db = getFirestore();
       _auth = getAuth();
       console.log("✅ Firebase Admin SDK initialized successfully.");
     } catch (error) {
@@ -31,14 +31,9 @@ function initFirebaseAdmin() {
   }
 }
 
-function getDb() {
-  if (!_db) _db = getFirestore();
-  return _db;
-}
-
 function getAdminAuth() {
   if (!_auth) _auth = getAuth();
   return _auth;
 }
 
-module.exports = { initFirebaseAdmin, getDb, getAdminAuth };
+module.exports = { initFirebaseAdmin, getAdminAuth };

@@ -11,6 +11,9 @@ const taskRoutes = require("./routes/taskRoutes");
 const habitRoutes = require("./routes/habitRoutes");
 const logRoutes = require("./routes/logRoutes");
 const integrationRoutes = require("./routes/integrationRoutes");
+const deckRoutes = require("./routes/deckRoutes");
+const eventRoutes = require("./routes/eventRoutes");
+const uploadRoutes = require("./routes/uploadRoutes");
 const { errorHandler, notFoundHandler } = require("./middleware/errorMiddleware");
 
 // Initialize Firebase Admin SDK
@@ -29,9 +32,10 @@ const isProduction = process.env.NODE_ENV === "production";
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: isProduction ? 100 : 2000, // limit each IP to N requests per windowMs
-  message: "Too many requests from this IP, please try again later."
+  message: { error: "Too many requests from this IP, please try again later." },
+  // Preflights aren't real work and shouldn't count toward the budget.
+  skip: (req) => req.method === "OPTIONS",
 });
-app.use("/api/", limiter);
 
 // CORS Config
 // Reflects whatever origin the request came from instead of one hardcoded
@@ -42,6 +46,11 @@ app.use(cors({
   origin: true,
   credentials: true
 }));
+
+// Mounted AFTER cors on purpose. When the limiter runs first its 429 response
+// carries no CORS headers, so the browser reports a rate-limit rejection as a
+// misleading "No 'Access-Control-Allow-Origin' header" error instead.
+app.use("/api/", limiter);
 
 // Body Parsers
 app.use(express.json());
@@ -59,6 +68,9 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/habits", habitRoutes);
 app.use("/api/logs", logRoutes);
 app.use("/api/integrations", integrationRoutes);
+app.use("/api/decks", deckRoutes);
+app.use("/api/events", eventRoutes);
+app.use("/api/upload", uploadRoutes);
 
 // Error Handling
 app.use(notFoundHandler);

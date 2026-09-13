@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4f9ed4"/>
+      <stop offset="0.48" stop-color="#91c8e5"/>
+      <stop offset="0.76" stop-color="#c7dce2"/>
+      <stop offset="1" stop-color="#e9c5a4"/>
+    </linearGradient>
+    <linearGradient id="haze" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#ffe7cd" stop-opacity=".72"/>
+    </linearGradient>
+    <linearGradient id="ridge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#83969a"/>
+      <stop offset="1" stop-color="#526b6d"/>
+    </linearGradient>
+    <filter id="cloud" x="-30%" y="-50%" width="160%" height="200%">
+      <feTurbulence type="fractalNoise" baseFrequency=".012 .026" numOctaves="5" seed="17" result="noise"/>
+      <feColorMatrix in="noise" type="luminanceToAlpha" result="alpha"/>
+      <feComponentTransfer in="alpha" result="soft">
+        <feFuncA type="table" tableValues="0 0 .08 .42 .82 1"/>
+      </feComponentTransfer>
+      <feGaussianBlur in="soft" stdDeviation="10" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="in"/>
+    </filter>
+    <filter id="distantCloud" x="-20%" y="-60%" width="140%" height="220%">
+      <feTurbulence type="fractalNoise" baseFrequency=".018 .04" numOctaves="4" seed="8" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="36"/>
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#sky)"/>
+  <ellipse cx="790" cy="190" rx="205" ry="190" fill="#fff5d6" opacity=".16"/>
+
+  <g filter="url(#cloud)" opacity=".88" fill="#f8fbfb">
+    <path d="M-120 300 C40 168 198 195 305 277 C426 202 566 232 635 335 C442 400 176 404-70 367Z"/>
+    <path d="M500 474 C612 357 772 362 843 432 C924 391 1037 424 1102 516 C918 566 696 559 528 527Z"/>
+  </g>
+  <g filter="url(#distantCloud)" opacity=".35" fill="#eef5f5">
+    <path d="M-40 545 C131 481 280 500 430 568 C279 607 111 617-40 592Z"/>
+    <path d="M610 246 C765 186 926 208 1080 276 C926 313 758 318 610 289Z"/>
+  </g>
+
+  <rect y="560" width="1024" height="290" fill="url(#haze)"/>
+  <path d="M0 825 91 773l81 21 99-91 74 45 113-119 106 115 88-54 93 62 103-91 91 88 89-44v319H0Z" fill="#91a8aa" opacity=".62"/>
+  <path d="M0 886 112 817l117 42 119-73 111 76 147-106 127 104 117-64 164 102 110-49v175H0Z" fill="url(#ridge)" opacity=".88"/>
+  <path d="M0 940 150 891l141 36 140-54 137 52 172-78 144 67 130-39 150 68v81H0Z" fill="#354f4d" opacity=".86"/>
+</svg>

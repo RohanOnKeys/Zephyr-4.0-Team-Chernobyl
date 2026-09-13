@@ -1,5 +1,5 @@
 const cron = require("node-cron");
-const { getDb } = require("../config/firebaseAdmin");
+const { query } = require("../config/db");
 const { sendMail } = require("../services/emailService");
 
 function currentHHMM() {
@@ -10,27 +10,20 @@ function currentHHMM() {
 }
 
 async function sendDueReminders() {
-  const db = getDb();
-  const hhmm = currentHHMM();
+  const { rows } = await query(
+    `SELECT h.name, u.email
+       FROM habits h
+       JOIN users u ON u.uid = h.user_id
+      WHERE h.reminder_time = $1 AND NOT h.is_archived`,
+    [currentHHMM()]
+  );
 
-  const habitsSnapshot = await db
-    .collection("habits")
-    .where("reminderTime", "==", hhmm)
-    .where("isArchived", "==", false)
-    .get();
-
-  if (habitsSnapshot.empty) return;
-
-  for (const doc of habitsSnapshot.docs) {
-    const habit = doc.data();
-    const userDoc = await db.collection("users").doc(habit.userId).get();
-    const email = userDoc.data()?.email;
-    if (!email) continue;
-
+  for (const row of rows) {
+    if (!row.email) continue;
     await sendMail({
-      to: email,
-      subject: `Reminder: ${habit.name}`,
-      text: `Time for your habit "${habit.name}" — open Habitify to check it off.`,
+      to: row.email,
+      subject: `Reminder: ${row.name}`,
+      text: `Time for your habit "${row.name}" — open Habitify to check it off.`,
     });
   }
 }
@@ -46,4 +39,4 @@ function startReminderScheduler() {
   console.log("✅ Reminder scheduler started (checks every minute).");
 }
 
-module.exports = { startReminderScheduler };
+module.exports = { startReminderScheduler, sendDueReminders };

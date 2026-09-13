@@ -2,21 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Plus, Sparkles, Map } from "lucide-react";
-import {
-  getMe,
-  getHabits,
-  createHabit,
-  updateHabit,
-  archiveHabit as archiveHabitRequest,
-  deleteHabit as deleteHabitRequest,
-  getTodayLogs,
-  getRangeLogs,
-  getHeatmapLogs,
-  createLog,
-  deleteLog,
-} from "../lib/api";
-import { streakFromKeys, todayKey, weekKeys, STREAK_MILESTONES } from "../utils/dateHelpers";
+import { getMe } from "../lib/api";
+import { STREAK_MILESTONES } from "../utils/dateHelpers";
 import { celebrate, celebrateBig, celebrateMilestone } from "../utils/confetti";
+import useHabits from "../hooks/useHabits";
 import IntegrationsPanel from "../components/IntegrationsPanel";
 import Modal from "../components/habits/Modal";
 import HabitForm from "../components/habits/HabitForm";
@@ -36,27 +25,36 @@ import RemindersCard from "../components/habits/RemindersCard";
 import { getAchievementProgress } from "../utils/achievements";
 import Mascot, { celebrationPoseForCategory } from "../components/habits/Mascot";
 
-const RECOVERY_DISMISSED_KEY = "habit-recovery-dismissed";
-
 export default function Dashboard() {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
 
   const [backendUser, setBackendUser] = useState(null);
 
-  const [habits, setHabits] = useState([]);
-  const [todayLogs, setTodayLogs] = useState([]);
-  const [weekLogs, setWeekLogs] = useState([]);
-  const [heatmap, setHeatmap] = useState([]);
-  const [logsByHabit90d, setLogsByHabit90d] = useState({});
-  const [loading, setLoading] = useState(true);
+  const {
+    habits,
+    heatmap,
+    loading,
+    completedTodayIds,
+    weekLogsByHabit,
+    streaksById,
+    todayProgress,
+    activeStreaks,
+    bestStreak,
+    weekRate,
+    recoveryHabit,
+    dismissRecovery,
+    toggleHabit: toggleHabitRequest,
+    saveHabit: saveHabitRequest,
+    removeHabit,
+    archiveHabit,
+  } = useHabits(currentUser);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [suggestOpen, setSuggestOpen] = useState(false);
-  const [recoveryHabit, setRecoveryHabit] = useState(null);
   const [journeyOpen, setJourneyOpen] = useState(false);
   const [celebrationMascot, setCelebrationMascot] = useState(false);
   const [celebrationPose, setCelebrationPose] = useState("celebrate");
@@ -67,83 +65,13 @@ export default function Dashboard() {
     setTimeout(() => setCelebrationMascot(false), 1800);
   }
 
-  async function loadAll() {
-    setLoading(true);
-    try {
-      const week = weekKeys();
-      const [habitsData, todayData, weekData, heatmapData] = await Promise.all([
-        getHabits(currentUser),
-        getTodayLogs(currentUser),
-        getRangeLogs(currentUser, week[0].key, week[6].key),
-        getHeatmapLogs(currentUser),
-      ]);
-
-      setHabits(habitsData);
-      setTodayLogs(todayData);
-      setWeekLogs(weekData);
-      setHeatmap(heatmapData);
-
-      const start90 = heatmapData[0]?.date || todayKey();
-      const range90 = await getRangeLogs(currentUser, start90, todayKey());
-      const byHabit = {};
-      for (const h of habitsData) byHabit[h.id] = [];
-      for (const l of range90) {
-        if (!byHabit[l.habitId]) byHabit[l.habitId] = [];
-        byHabit[l.habitId].push(l.date);
-      }
-      setLogsByHabit90d(byHabit);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   useEffect(() => {
     if (!currentUser) return;
     getMe(currentUser).then(setBackendUser).catch(console.error);
-    loadAll();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
-
-  const completedTodayIds = useMemo(() => new Set(todayLogs.map((l) => l.habitId)), [todayLogs]);
-
-  const weekLogsByHabit = useMemo(() => {
-    const out = {};
-    for (const l of weekLogs) {
-      if (!out[l.habitId]) out[l.habitId] = [];
-      out[l.habitId].push(l.date);
-    }
-    return out;
-  }, [weekLogs]);
-
-  const streaksById = useMemo(() => {
-    const out = {};
-    for (const h of habits) out[h.id] = streakFromKeys(logsByHabit90d[h.id] || []);
-    return out;
-  }, [habits, logsByHabit90d]);
-
-  const todayProgress = habits.length ? Math.round((completedTodayIds.size / habits.length) * 100) : 0;
-  const activeStreaks = Object.values(streaksById).filter((s) => s.current > 0).length;
-  const bestStreak = Math.max(0, ...Object.values(streaksById).map((s) => s.longest));
-  const weekTotal = habits.length * 7;
-  const weekDone = Object.values(weekLogsByHabit).reduce((s, arr) => s + arr.length, 0);
-  const weekRate = weekTotal ? Math.round((weekDone / weekTotal) * 100) : 0;
 
   const achievements = useMemo(() => getAchievementProgress(backendUser?.stats || {}), [backendUser?.stats]);
   const unlockedAchievements = achievements.filter((a) => a.unlocked).length;
-
-  useEffect(() => {
-    if (recoveryHabit || !habits.length) return;
-    const dismissed = JSON.parse(localStorage.getItem(RECOVERY_DISMISSED_KEY) || "{}");
-    for (const h of habits) {
-      const s = streaksById[h.id];
-      if (s && s.longest >= 7 && s.current === 0 && !dismissed[h.id]) {
-        setRecoveryHabit({ ...h, longest: s.longest });
-        return;
-      }
-    }
-  }, [habits, streaksById, recoveryHabit]);
 
   async function handleLogout() {
     try {
@@ -155,55 +83,29 @@ export default function Dashboard() {
   }
 
   async function toggleHabit(habit) {
-    const done = completedTodayIds.has(habit.id);
-    const today = todayKey();
-    const willCompleteAll = !done && completedTodayIds.size + 1 === habits.length && habits.length > 0;
     const previousLevel = backendUser?.stats?.level;
+    const { completed, stats, newStreak, completedAll } = await toggleHabitRequest(habit);
+    if (stats) setBackendUser((u) => (u ? { ...u, stats } : u));
+    if (!completed) return;
 
-    if (done) {
-      const { stats } = await deleteLog(currentUser, habit.id, today);
-      setTodayLogs((logs) => logs.filter((l) => l.habitId !== habit.id));
-      setLogsByHabit90d((prev) => ({
-        ...prev,
-        [habit.id]: (prev[habit.id] || []).filter((d) => d !== today),
-      }));
-      if (stats) setBackendUser((u) => (u ? { ...u, stats } : u));
-    } else {
-      const { stats, ...log } = await createLog(currentUser, habit.id, today);
-      setTodayLogs((logs) => [...logs, log]);
-      setLogsByHabit90d((prev) => ({
-        ...prev,
-        [habit.id]: [...(prev[habit.id] || []), today],
-      }));
-      if (stats) setBackendUser((u) => (u ? { ...u, stats } : u));
+    celebrate();
+    showCelebrationMascot(celebrationPoseForCategory(habit.category));
 
-      celebrate();
-      showCelebrationMascot(celebrationPoseForCategory(habit.category));
+    const hitMilestone = STREAK_MILESTONES.includes(newStreak);
+    const leveledUp = previousLevel != null && stats?.level > previousLevel;
+    if (hitMilestone || leveledUp) {
+      setTimeout(celebrateMilestone, 150);
+    }
 
-      const newStreak = streakFromKeys([...(logsByHabit90d[habit.id] || []), today]).current;
-      const hitMilestone = STREAK_MILESTONES.includes(newStreak);
-      const leveledUp = previousLevel != null && stats?.level > previousLevel;
-      if (hitMilestone || leveledUp) {
-        setTimeout(celebrateMilestone, 150);
-      }
-
-      if (willCompleteAll) {
-        setTimeout(celebrateBig, 300);
-      }
+    if (completedAll) {
+      setTimeout(celebrateBig, 300);
     }
   }
 
   async function saveHabit(data) {
     setSubmitting(true);
     try {
-      if (editing) {
-        const updated = await updateHabit(currentUser, editing.id, data);
-        setHabits((hs) => hs.map((h) => (h.id === updated.id ? updated : h)));
-      } else {
-        const created = await createHabit(currentUser, data);
-        setHabits((hs) => [...hs, created]);
-        setLogsByHabit90d((prev) => ({ ...prev, [created.id]: [] }));
-      }
+      await saveHabitRequest(data, editing);
       setFormOpen(false);
       setEditing(null);
     } finally {
@@ -212,19 +114,16 @@ export default function Dashboard() {
   }
 
   async function handleDelete(habit) {
-    await deleteHabitRequest(currentUser, habit.id);
-    setHabits((hs) => hs.filter((h) => h.id !== habit.id));
-    setTodayLogs((ls) => ls.filter((l) => l.habitId !== habit.id));
+    await removeHabit(habit);
     setDeleteTarget(null);
   }
 
   async function handleArchive(habit) {
-    await archiveHabitRequest(currentUser, habit.id);
-    setHabits((hs) => hs.filter((h) => h.id !== habit.id));
+    await archiveHabit(habit);
   }
 
   async function acceptSuggestion(s) {
-    const created = await createHabit(currentUser, {
+    await saveHabitRequest({
       name: s.name,
       description: s.description,
       category: s.category,
@@ -232,8 +131,6 @@ export default function Dashboard() {
       frequency: s.frequency,
       targetDays: s.frequency === "daily" ? 7 : 3,
     });
-    setHabits((hs) => [...hs, created]);
-    setLogsByHabit90d((prev) => ({ ...prev, [created.id]: [] }));
   }
 
   if (loading) return <LoadingSpinner full />;
@@ -252,6 +149,14 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => navigate("/study-girl")}
+              className="px-3 py-2 text-sm font-medium text-[#071512] bg-[#f0c674] hover:bg-[#ffd98c] rounded-lg flex items-center gap-1.5"
+            >
+              <Map size={14} />
+              Enter Lo-Fi Room
+            </button>
             <button
               onClick={() => setSuggestOpen(true)}
               className="px-3 py-2 text-sm text-[#a8d8c8] border border-[#17493e] rounded-lg hover:bg-[#0d2e27] flex items-center gap-1.5"
@@ -290,12 +195,7 @@ export default function Dashboard() {
             {recoveryHabit && (
               <StreakRecoveryCard
                 habit={recoveryHabit}
-                onDismiss={() => {
-                  const dismissed = JSON.parse(localStorage.getItem(RECOVERY_DISMISSED_KEY) || "{}");
-                  dismissed[recoveryHabit.id] = Date.now();
-                  localStorage.setItem(RECOVERY_DISMISSED_KEY, JSON.stringify(dismissed));
-                  setRecoveryHabit(null);
-                }}
+                onDismiss={dismissRecovery}
               />
             )}
 

@@ -1,0 +1,24 @@
+Title: Lo Fi Study Girl
+URL: https://sketchfab.com/3d-models/lo-fi-study-girl-15961a17a125467e9367ee452fd1950c
+Author: https://sketchfab.com/fogainak
+
+Vertices: 2234
+Polygons: 3678
+Animations: 1
+
+Download Date: 13-09-2026
+Download Format: GLTF
+Download Path: C:\Ripper\Downloads\AndrasX\01- Lo.Fi.Study.Girl\
+Download File: 15961a17a125467e9367ee452fd1950c_Textured.gltf
+
+Textures: 10
+#1: 147538067bba4c79a4c68bf842553ed8_RGB_BACKDROP.png
+#2: 4759c37aadf2431e9e30990670b33bbb_RGB_.texturelofifinal4.png
+#3: 4ecb530c420a4489b85935ffcae685e4_RGB_friz.png
+#4: 502ec8a9390e4582b0fadf3cdd221934_RGB_WALL.png
+#5: 5602fffd0ddc419ab6753c04daca3b66_RGB_texturelofiemission2.png
+#6: 5a4943f03f0b415c8c80f780fc723106_A_WALLD.png
+#7: b84f15209cd745708f7e17fb3e60c4a3_A_frizD.png
+#8: be9198834b2c4938b2397b8891419a9c_RGB_floor.png
+#9: e87c582ea9b141e59d654bacc1a10851_A_texturelofifinal2.png
+#10: e89216d8fb544d0b87b9de783f5adfbb_A_FLOORD.png

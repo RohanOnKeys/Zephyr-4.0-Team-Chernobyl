@@ -1,4 +1,4 @@
-const { getDb } = require("../config/firebaseAdmin");
+const { query } = require("../config/db");
 const { updateIntegrations } = require("../services/userService");
 const { getGithubStats } = require("../services/githubService");
 const { getLeetcodeStats } = require("../services/leetcodeService");
@@ -21,8 +21,8 @@ const saveIntegrations = async (req, res, next) => {
 const getGithub = async (req, res, next) => {
   try {
     const { uid } = req.user;
-    const userDoc = await getDb().collection("users").doc(uid).get();
-    const username = userDoc.data()?.integrations?.github;
+    const result = await query("SELECT github_username FROM users WHERE uid = $1", [uid]);
+    const username = result.rows[0]?.github_username;
 
     if (!username) {
       return res.status(400).json({ error: "No GitHub username saved for this user" });
@@ -39,8 +39,8 @@ const getGithub = async (req, res, next) => {
 const getLeetcode = async (req, res, next) => {
   try {
     const { uid } = req.user;
-    const userDoc = await getDb().collection("users").doc(uid).get();
-    const username = userDoc.data()?.integrations?.leetcode;
+    const result = await query("SELECT leetcode_username FROM users WHERE uid = $1", [uid]);
+    const username = result.rows[0]?.leetcode_username;
 
     if (!username) {
       return res.status(400).json({ error: "No LeetCode username saved for this user" });

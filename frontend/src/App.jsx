@@ -5,6 +5,7 @@ import PublicRoute from "./components/PublicRoute";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import StudyGirlPage from "./pages/StudyGirlPage";
 
 function App() {
   return (
@@ -24,6 +25,8 @@ function App() {
               <Register />
             </PublicRoute>
           } />
+
+          <Route path="/study-girl" element={<StudyGirlPage />} />
           
           <Route path="/dashboard" element={
             <ProtectedRoute>
