@@ -4,7 +4,7 @@ export default function SplineScene() {
       <div
         className="absolute inset-0"
         style={{
-          zoom: 0.3,
+          zoom: 0.45,
         }}
       >
         <iframe
