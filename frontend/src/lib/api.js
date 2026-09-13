@@ -109,6 +109,11 @@ export function logProductive(user, kind, ref) {
   });
 }
 
+/** Asks the server whether a site allows being shown inside an iframe. */
+export function checkFrame(user, url) {
+  return authedFetch(`/browser/frame-check?url=${encodeURIComponent(url)}`, user);
+}
+
 /* ------------------------------------------------------------ flashcards -- */
 
 export function getDecks(user) {

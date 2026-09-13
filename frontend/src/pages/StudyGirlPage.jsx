@@ -431,6 +431,31 @@ function RoomClockWidget() {
   );
 }
 
+// Inline SVG controls. The old text glyphs (roman numerals, command sign) fell
+// back to whatever serif font had them, so buttons looked mismatched and off-centre.
+const PLAYER_ICONS = {
+  play: "M8 5.5v13l11-6.5z",
+  pause: "M7 5h3.5v14H7zM13.5 5H17v14h-3.5z",
+  prev: "M6 5h2v14H6zM9.5 12L19 5.5v13z",
+  next: "M16 5h2v14h-2zM14.5 12L5 18.5v-13z",
+  shuffle: "M16 4l4 3.5-4 3.5V8.6h-1.6c-1 0-1.9.5-2.4 1.3l-4.3 6.5c-.9 1.3-2.3 2.1-3.9 2.1H2v-2.2h1.8c.8 0 1.5-.4 2-1l4.3-6.5C11 7.3 12.6 6.4 14.4 6.4H16zM2 6.4h1.8c1.6 0 3 .8 3.9 2.1l.7 1-1.3 2-1.2-1.8c-.5-.7-1.2-1.1-2-1.1H2zm14 9.2V14l4 3.5-4 3.5v-2.4h-1.6c-1.8 0-3.4-.9-4.3-2.3l-.7-1 1.3-2 1.2 1.8c.5.8 1.4 1.3 2.4 1.3z",
+  add: "M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z",
+  check: "M9.5 16.2L5.3 12l-1.4 1.4 5.6 5.6L20.1 8.4 18.7 7z",
+  volume: "M4 9h4l5-4v14l-5-4H4zM16 8.5a5 5 0 010 7l-1.4-1.4a3 3 0 000-4.2zM18.5 6a8.5 8.5 0 010 12l-1.4-1.4a6.5 6.5 0 000-9.2z",
+  mute: "M4 9h4l5-4v14l-5-4H4zm12.3.3l1.4-1.4L20 10.2l2.3-2.3 1.4 1.4-2.3 2.3 2.3 2.3-1.4 1.4-2.3-2.3-2.3 2.3-1.4-1.4 2.3-2.3z",
+  home: "M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z",
+  search: "M10.5 3a7.5 7.5 0 015.9 12.1l4.8 4.8-1.4 1.4-4.8-4.8A7.5 7.5 0 1110.5 3zm0 2a5.5 5.5 0 100 11 5.5 5.5 0 000-11z",
+  library: "M4 4h2v16H4zm4 0h2v16H8zm4.2.6l1.9-.6 5 15.2-1.9.6z",
+};
+
+function PlayerIcon({ name, size = 18 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+      <path d={PLAYER_ICONS[name]} />
+    </svg>
+  );
+}
+
 function MusicControls({ music, compact = false }) {
   const progress = music.duration ? (music.currentTime / music.duration) * 100 : 0;
   const formatTime = (value) => {
@@ -448,13 +473,13 @@ function MusicControls({ music, compact = false }) {
           {!compact && <span>{formatTime(music.currentTime)} / {formatTime(music.duration)}</span>}
         </div>
         <div className="music-actions">
-          {!compact && <button type="button" className={music.shuffle ? "is-active" : ""} onClick={music.toggleShuffle} aria-label="Toggle shuffle">⌘</button>}
-          <button type="button" onClick={music.previous} aria-label="Previous song">Ⅰ◀</button>
-          <button type="button" className="music-play" onClick={music.toggle} aria-label={music.playing ? `Pause ${music.track.title}` : `Play ${music.track.title}`}>{music.playing ? "Ⅱ" : "▶"}</button>
-          <button type="button" onClick={music.next} aria-label="Next song">▶Ⅰ</button>
-          {!compact && <button type="button" className={music.saved ? "is-active" : ""} onClick={music.toggleSaved} aria-label={music.saved ? "Remove from favorites" : "Add to favorites"}>{music.saved ? "✓" : "+"}</button>}
+          {!compact && <button type="button" className={music.shuffle ? "is-active" : ""} onClick={music.toggleShuffle} aria-label="Toggle shuffle"><PlayerIcon name="shuffle" /></button>}
+          <button type="button" onClick={music.previous} aria-label="Previous song"><PlayerIcon name="prev" /></button>
+          <button type="button" className="music-play" onClick={music.toggle} aria-label={music.playing ? `Pause ${music.track.title}` : `Play ${music.track.title}`}><PlayerIcon name={music.playing ? "pause" : "play"} size={compact ? 16 : 22} /></button>
+          <button type="button" onClick={music.next} aria-label="Next song"><PlayerIcon name="next" /></button>
+          {!compact && <button type="button" className={music.saved ? "is-active" : ""} onClick={music.toggleSaved} aria-label={music.saved ? "Remove from favorites" : "Add to favorites"}><PlayerIcon name={music.saved ? "check" : "add"} /></button>}
         </div>
-        <div className="music-volume"><button type="button" onClick={music.toggleMute} aria-label={music.muted ? "Unmute" : "Mute"}>{music.muted ? "🔇" : "🔊"}</button><input aria-label="Volume" type="range" min="0" max="1" step="0.01" value={music.muted ? 0 : music.volume} onInput={(event) => music.setVolume(Number(event.currentTarget.value))} /></div>
+        <div className="music-volume"><button type="button" onClick={music.toggleMute} aria-label={music.muted ? "Unmute" : "Mute"}><PlayerIcon name={music.muted ? "mute" : "volume"} size={16} /></button><input aria-label="Volume" type="range" min="0" max="1" step="0.01" value={music.muted ? 0 : music.volume} onInput={(event) => music.setVolume(Number(event.currentTarget.value))} /></div>
       </div>
     </div>
   );
@@ -509,6 +534,9 @@ function LaptopOS({ onClose, music, initialApp = "browser" }) {
   const [minimized, setMinimized] = useState(false);
   const [address, setAddress] = useState("zephyr://home");
   const [page, setPage] = useState("zephyr://home");
+  // "checking" | "embed" | "blocked" - most big sites refuse to be framed, so
+  // we ask the server first instead of showing the browser's broken-page icon.
+  const [frameState, setFrameState] = useState("embed");
   const [notes, setNotes] = useState("Focus for today:\n• Finish the 3D study room\n• Review quests\n• Take a real break");
   const [spotifyView, setSpotifyView] = useState("home");
   const [showOfficial, setShowOfficial] = useState(false);
@@ -528,6 +556,17 @@ function LaptopOS({ onClose, music, initialApp = "browser" }) {
     const url = next.includes("://") ? next : `https://${next}`;
     setAddress(url);
     setPage(url);
+
+    if (signedIn) {
+      setFrameState("checking");
+      api
+        .checkFrame(currentUser, url)
+        .then((result) => setFrameState(result?.embeddable ? "embed" : "blocked"))
+        .catch(() => setFrameState("blocked"));
+    } else {
+      // Guests can't call the check; try the frame and keep the new-tab escape hatch visible.
+      setFrameState("embed");
+    }
 
     if (!signedIn) return;
     const kind = classifySite(url);
@@ -608,13 +647,29 @@ function LaptopOS({ onClose, music, initialApp = "browser" }) {
                   <button type="button" onClick={() => openPage("https://example.com")}>Reading</button>
                 </div>
               </div>
-            ) : <iframe title="Zephyr browser" src={page} sandbox="allow-forms allow-scripts allow-same-origin allow-popups" />}
+            ) : (
+              <div className="os-page">
+                <div className="os-page-bar">
+                  <span>{(() => { try { return new URL(page).hostname; } catch { return page; } })()}</span>
+                  <a href={page} target="_blank" rel="noopener noreferrer">Open in new tab ↗</a>
+                </div>
+                {frameState === "checking" && <div className="os-page-state" role="status">Loading…</div>}
+                {frameState === "blocked" && (
+                  <div className="os-page-state os-page-blocked">
+                    <strong>{(() => { try { return new URL(page).hostname; } catch { return "This site"; } })()} can't be shown inside this window</strong>
+                    <p>The site blocks being embedded in other apps for security. Open it in a new tab — your study XP still counts.</p>
+                    <a className="os-page-open" href={page} target="_blank" rel="noopener noreferrer">Open {(() => { try { return new URL(page).hostname; } catch { return "site"; } })()} ↗</a>
+                  </div>
+                )}
+                {frameState === "embed" && <iframe title="Zephyr browser" src={page} sandbox="allow-forms allow-scripts allow-same-origin allow-popups" />}
+              </div>
+            )}
           </div>
         )}
 
         {activeApp === "spotify" && (
           <div className="os-spotify">
-            <aside><strong>Spotify</strong><button type="button" className={spotifyView === "home" ? "active" : ""} onClick={() => setSpotifyView("home")}>⌂ Home</button><button type="button" className={spotifyView === "search" ? "active" : ""} onClick={() => setSpotifyView("search")}>⌕ Search</button><button type="button" className={spotifyView === "library" ? "active" : ""} onClick={() => setSpotifyView("library")}>▤ Your Library</button><small>OFFICIAL NCS PLAYLIST</small><button type="button" onClick={() => setShowOfficial((value) => !value)}>NCS Releases</button></aside>
+            <aside><strong>Spotify</strong><button type="button" className={spotifyView === "home" ? "active" : ""} onClick={() => setSpotifyView("home")}><PlayerIcon name="home" size={16} /> Home</button><button type="button" className={spotifyView === "search" ? "active" : ""} onClick={() => setSpotifyView("search")}><PlayerIcon name="search" size={16} /> Search</button><button type="button" className={spotifyView === "library" ? "active" : ""} onClick={() => setSpotifyView("library")}><PlayerIcon name="library" size={16} /> Your Library</button><small>OFFICIAL NCS PLAYLIST</small><button type="button" onClick={() => setShowOfficial((value) => !value)}>NCS Releases</button></aside>
             <div className="spotify-main">
               <div className="spotify-heading"><span>Playlist</span><h2>NCS Releases</h2><p>Copyright-free electronic music for studying, gaming and creating.</p></div>
               <MusicControls music={music} />
@@ -622,7 +677,7 @@ function LaptopOS({ onClose, music, initialApp = "browser" }) {
               <div className="spotify-track-list" aria-label="NCS songs">
                 {music.tracks.filter((track) => `${track.title} ${track.artist}`.toLowerCase().includes(music.query.toLowerCase())).map((track) => (
                   <button type="button" key={track.title} className={music.track.title === track.title ? "active" : ""} onClick={() => music.select(music.tracks.indexOf(track))}>
-                    <span>{music.track.title === track.title && music.playing ? "Ⅱ" : "▶"}</span><strong>{track.title}<small>{track.artist}</small></strong><em>NCS</em>
+                    <span className="spotify-track-icon"><PlayerIcon name={music.track.title === track.title && music.playing ? "pause" : "play"} size={14} /></span><strong>{track.title}<small>{track.artist}</small></strong><em>NCS</em>
                   </button>
                 ))}
               </div>

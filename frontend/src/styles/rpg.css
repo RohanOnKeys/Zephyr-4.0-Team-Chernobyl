@@ -1898,3 +1898,84 @@ a.journal-primary { display: inline-block; text-decoration: none; }
   }
 }
 
+
+/* ---------------------------------------------------------------------------
+   Spotify app layout fixes (full player only; the compact room player keeps
+   its own rules in index.css via .is-compact).
+   --------------------------------------------------------------------------- */
+
+/* The cover used aspect-ratio:1 inside a stretched grid row, so the tall player
+   row set its HEIGHT and the ratio forced an equal WIDTH, pushing it across its
+   column and over the song title. Pin it to its column width instead. */
+.music-controller:not(.is-compact) {
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: 1.1rem;
+  padding: .9rem 1.1rem;
+}
+.music-controller:not(.is-compact) .music-cover {
+  width: 7.5rem;
+  height: 7.5rem;
+  min-height: 0;
+  align-self: center;
+  font-size: 1.1rem;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .45);
+}
+.music-controller:not(.is-compact) .music-player-main {
+  grid-template: auto auto auto / minmax(0, 1fr) auto;
+  gap: .55rem 1rem;
+}
+.music-controller:not(.is-compact) .music-meta { grid-column: 1 / -1; }
+.music-controller:not(.is-compact) .music-meta strong { font-size: 1.15rem; line-height: 1.2; }
+.music-controller:not(.is-compact) .music-meta span { font-size: .72rem; }
+.music-controller:not(.is-compact) .music-timeline { grid-column: 1 / -1; }
+.music-controller:not(.is-compact) .music-timeline span { min-width: 5.5rem; text-align: right; font-variant-numeric: tabular-nums; }
+/* Controls centred in the main column, volume right-aligned on the same row,
+   instead of volume dangling on its own line below. */
+.music-controller:not(.is-compact) .music-actions { grid-column: 1; justify-content: center; gap: 1rem; }
+.music-controller:not(.is-compact) .music-volume { grid-column: 2; align-self: center; grid-template-columns: 1.8rem 6.5rem; }
+
+.music-actions button,
+.music-volume button,
+.os-spotify > aside button,
+.spotify-track-icon { display: inline-flex; align-items: center; justify-content: center; }
+.music-actions button { transition: color .15s ease, transform .15s ease; }
+.music-actions button:hover { transform: scale(1.08); }
+.music-actions .music-play:hover { color: #111; transform: scale(1.06); }
+.music-actions button:focus-visible,
+.music-volume button:focus-visible,
+.os-spotify button:focus-visible { outline: 2px solid #1ed760; outline-offset: 2px; }
+
+.os-spotify > aside button { justify-content: flex-start; gap: .55rem; }
+.spotify-track-icon { width: 1.8rem; height: 1.8rem; color: #b3b3b3; }
+.spotify-track-list button.active .spotify-track-icon { color: #1ed760; }
+.spotify-track-list button { padding: .55rem .7rem; }
+.spotify-track-list strong small { margin-top: .12rem; }
+.spotify-heading { padding: 1.2rem 1rem .9rem; }
+.spotify-official-toggle { margin-top: .6rem; }
+
+@media (max-width: 720px) {
+  .music-controller:not(.is-compact) { grid-template-columns: 4.5rem minmax(0, 1fr); gap: .75rem; }
+  .music-controller:not(.is-compact) .music-cover { width: 4.5rem; height: 4.5rem; }
+  .music-controller:not(.is-compact) .music-player-main { grid-template-columns: minmax(0, 1fr); }
+  .music-controller:not(.is-compact) .music-volume { grid-column: 1; justify-content: end; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .music-actions button, .music-actions button:hover { transition: none; transform: none; }
+}
+
+/* In-room browser: page wrapper, a host bar with an always-available new-tab
+   link, and a fallback card for sites that refuse to be framed. */
+.os-page { min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); background: #fff; }
+.os-page-bar { display: flex; align-items: center; justify-content: space-between; gap: .6rem; padding: .3rem .75rem; border-bottom: 1px solid #e3e8e7; background: #f6f8f7; font-size: .66rem; color: #52656d; }
+.os-page-bar span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.os-page-bar a { flex-shrink: 0; color: #2f7f9a; font-weight: 700; text-decoration: none; }
+.os-page-bar a:hover { text-decoration: underline; }
+.os-page iframe { width: 100%; height: 100%; border: 0; }
+.os-page-state { display: grid; place-content: center; justify-items: center; gap: .6rem; padding: 2rem; text-align: center; color: #52656d; font-size: .8rem; }
+.os-page-blocked { background: linear-gradient(180deg, #f7faf9, #edf3f2); }
+.os-page-blocked strong { max-width: 30rem; color: #22303a; font: 700 1.05rem Georgia, serif; }
+.os-page-blocked p { max-width: 26rem; margin: 0; line-height: 1.5; }
+.os-page-open { margin-top: .4rem; padding: .6rem 1.1rem; border-radius: 999px; color: #fff; background: #2f7f9a; font-weight: 700; text-decoration: none; box-shadow: 0 6px 16px rgba(47, 127, 154, .28); }
+.os-page-open:hover { background: #276c83; }
+.os-page-bar a:focus-visible, .os-page-open:focus-visible { outline: 2px solid #2f7f9a; outline-offset: 2px; }

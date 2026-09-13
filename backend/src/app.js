@@ -13,6 +13,7 @@ const logRoutes = require("./routes/logRoutes");
 const integrationRoutes = require("./routes/integrationRoutes");
 const deckRoutes = require("./routes/deckRoutes");
 const eventRoutes = require("./routes/eventRoutes");
+const browserRoutes = require("./routes/browserRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const { errorHandler, notFoundHandler } = require("./middleware/errorMiddleware");
 
@@ -70,6 +71,7 @@ app.use("/api/logs", logRoutes);
 app.use("/api/integrations", integrationRoutes);
 app.use("/api/decks", deckRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/browser", browserRoutes);
 app.use("/api/upload", uploadRoutes);
 
 // Error Handling
